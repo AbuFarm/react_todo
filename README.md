@@ -119,3 +119,60 @@ Todo на сегодня:
 Забег на лыжах 2км
 Ужин в 18:00
 Английский с 19:00 до 19:45
+
+Каждый дочерний элемент в списке должен иметь уникальную "ключевую" опору. Each child in a list should have a unique "key" prop
+В React для каждого объекта который явл интегрируемым должны добавить специальный атрибут key. это нужно для более эффективного рендеринга шаблона 
+
+                                                                             return <TodoItem todo={todo} key={todo.id}/>
+
+Можно добавить перечисление todo добавив дополнительный параметр index в методе map 
+   TodoList.js                     
+                        import React from 'react';
+                        import TodoItem from './TodoItem'
+                        
+                        export default function TodoList(props) {
+
+                            const styles = {
+                                ul: {
+                                    listStyle: 'none',
+                                    margine: 0,
+                                    padding: 0
+                                }
+                            }
+
+                            return (
+                                <div>
+                                    <ul style={styles.ul}>
+                                        {props.todos.map((todo, index) => {
+                                            return <TodoItem todo={todo} key={todo.id} index={index}/>
+                                        })}
+                                    </ul>
+                                </div>
+                            )
+                        }
+                        
+ В  TodoItem.js также принимаем дополнительный парамтр index 
+         
+                        import React from 'react';
+
+                        export default function TodoItem( {todo, index} ) {
+
+                            return (
+                                <div>
+                                    <li>{index + 1}) {todo.title}</li>
+                                </div>
+                            )
+                        }
+                        
+   Также можно не передавая index, т.к в передаваемом массиве todo есть id
+   
+                        import React from 'react';
+
+                        export default function TodoItem( {todo} ) {
+
+                            return (
+                                <div>
+                                    <li>{todo.id}){todo.title}</li>
+                                </div>
+                            )
+                        }
