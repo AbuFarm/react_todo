@@ -6,7 +6,8 @@ create react app todo lists
 иначе компонент безполезен.Всегда есть главный компонент, обычно App.js, куда экспортируется все другие компоненты
 Для экспорта компонентов нужно:
 *1 в экспортироваемом файле прописать 
-                                    export default function ...() {} если экспорт по умолчанию
+                                   a) export default function Name () {} если экспорт по умолчанию
+                                   b) export default Name
                                     
 2 Этап. Добавления динамики
 создам [] с делами в App.js
@@ -180,7 +181,67 @@ Todo на сегодня:
 
 Устанавливаю ------->   npm install prop-types   Перезагружаю сервак npm start
 
-Для исаользования нужно прописать                       import PropTypes from 'prop-types';
+Для использования нужно прописать в консоли                      import PropTypes from 'prop-types';
+TodoList.js :
+
+                        import React from 'react';
+                        import TodoItem from './TodoItem';
+                        import PropTypes from 'prop-types';
+                                        
+                        function TodoList(props) {
+
+                            const styles = {
+                                ul: {
+                                    listStyle: 'none',
+                                    margine: 0,
+                                    padding: 0
+                                }
+                            }
+
+                            return (
+                                <div>
+                                    <ul style={styles.ul}>
+                                        {props.todos.map((todo, index) => {
+                                            return <TodoItem todo={todo} key={todo.id} index={index}/>
+                                        })}
+                                    </ul>
+                                </div>
+                            )
+                        }
 
 
+                        TodoList.propTypes = {
+                            todos: PropTypes.arrayOf(PropTypes.object).isRequired
+                        }
 
+                        export default TodoList
+
+Обращаюсь к ф-и TodoList и определяю у него св-во propTypes - это обычный объект , где описывается в качестве значения ключа - название св-ва, дальше используется библиотека PropTypes, чтобы определить его тип todos: PropTypes.array - это массив /   todos: PropTypes.arrayOf(PropTypes.object).isRequired  - массив arrayOf(PropTypes.object) состоящих из объектов , который необходим для работы данного компонента isRequired (флаг)
+
+Валидация для TodoItem.js тут уже два параметра 
+
+                        import React from 'react';
+                        import PropTypes from 'prop-types';
+
+                        function TodoItem( {todo, index} ) {
+
+                            return (
+                                <div>
+                                    <li>{index + 1}) {todo.title}</li>
+                                </div>
+                            )
+                        }
+
+
+                        TodoItem.proptypes = {
+                            todo: PropTypes.object.isRequired,
+                            index: PropTypes.number
+                        }
+
+
+                        export default TodoItem
+                        
+Для чего эти действия? Как пример кто-то по ошибке привёл number к строке
+
+                                                return <TodoItem todo={todo} key={todo.id} index={index.toString()}/>
+в таком случае в консоли будет видна ошибка, что невалидный тип у index, т.к программа ожидает принять number , а получает string. Валидация параметров помогает при раз-ке
