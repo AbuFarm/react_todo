@@ -245,3 +245,41 @@ TodoList.js :
 
                                                 return <TodoItem todo={todo} key={todo.id} index={index.toString()}/>
 в таком случае в консоли будет видна ошибка, что невалидный тип у index, т.к программа ожидает принять number , а получает string. Валидация параметров помогает при раз-ке
+                        
+                                                Warning: Failed prop type: Invalid prop `index` of type `string` supplied to `TodoItem`, expected `number`
+
+3 Этап. Оформление стилей и прописание логики
+
+                                                function TodoItem( {todo, index} ) {
+
+
+                                                    const styles = {
+                                                        li: {
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            padding: '.5rem 1rem',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '4px',
+                                                            marginBottom: '.5rem'
+                                                        },
+                                                        input: {
+                                                            marginRight: '1rem'
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <div>
+                                                            <li style={styles.li}>
+                                                                <span>
+                                                                    <input type='checkbox' style={styles.input} />
+                                                                    <strong>{index + 1}) </strong>
+                                                                    {todo.title}  
+                                                                </span>
+
+                                                                <button className='btn'>&times;</button>
+                                                            </li> 
+                                                        </div>
+                                                    )
+                                                }
+Стили можно добавить инлайн через объект или прописать в css добавив предварительно классы элементам через className. Обычно выбирают единый подход
