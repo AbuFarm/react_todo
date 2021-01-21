@@ -2,7 +2,7 @@ import React from 'react';
 import TodoItem from './TodoItem';
 import PropTypes from 'prop-types';
 
-function TodoList(props) {
+function TodoList(props, onToggle) {
 
     const styles = {
         ul: {
@@ -16,7 +16,11 @@ function TodoList(props) {
         <div>
             <ul style={styles.ul}>
                 {props.todos.map((todo, index) => {
-                    return <TodoItem todo={todo} key={todo.id} index={index.toString()}/>
+                    return <TodoItem 
+                    todo={todo} 
+                    key={todo.id} 
+                    index={index} 
+                    onChange={props.onToggle}/>
                 })}
             </ul>
         </div>
@@ -26,7 +30,7 @@ function TodoList(props) {
 
 TodoList.propTypes = {
     todos: PropTypes.arrayOf(PropTypes.object).isRequired,
-    index: PropTypes.number
+    onToggle: PropTypes.func.isRequired
 }
 
 export default TodoList

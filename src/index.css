@@ -17,3 +17,15 @@ code {
   margin: 0 auto;
   width: 600px;
 }
+
+
+.btn {
+  background-color: red;
+  border-radius: 50px;
+  color: white;
+  border: none;
+}
+
+.done{
+  text-decoration: line-through;
+}
