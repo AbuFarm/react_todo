@@ -13,6 +13,7 @@ code {
 }
 
 .wrapper {
+  display: block;
   padding-top: 5rem;
   margin: 0 auto;
   width: 600px;
