@@ -283,3 +283,191 @@ TodoList.js :
                                                     )
                                                 }
 Стили можно добавить инлайн через объект или прописать в css добавив предварительно классы элементам через className. Обычно выбирают единый подход
+
+        при выполнении todo он должен быть зачёркнут
+
+Тут необходимо работать через корневой элемент. Данный массив является определённым стейтом и не можем изменить отделльный компонент где-то в  дочерний элементах
+Если что-то меняем нужно изменить сам state
+
+                 const todos = [
+                        {id: 1, completed: false, title: "Забег на лыжах 2 км"},
+                        {id: 2, completed: false, title: "Ужин в 18:00"},
+                        {id: 3, completed: false, title: "Английский с 19:00 до 19:45"}
+                    ]
+При нажатии на imput типа chekbox по тому элементу которому кликнули изменить состояние completed на противоположное значения и перерисовать остальные элементы
+
+----------------------        Как добовлять события в JSX        ---------------------- 
+
+Это просто. Например для checkbox можно использовать события onChange           
+TodoItem.js:
+
+        <input type='checkbox' style={styles.input} onChange={() => console.log(todo.id)} />
+        
+Теперь нужно передать данное событие в родительский элемент из TodoItem.js в App.js т.к state там. И для этого в компоненте TodoItem я могу принимать ещё одну ф-ю/name random
+                               
+                                                function TodoItem( {todo, index, onChange} )
+                                                
+Когда будет происходить событие onChange я буду вызывать метод onChange, куда я буду передовать id по которому кликнул. Попутно опишу это свойство в propTyps
+
+                                        import React from 'react';
+                                        import PropTypes from 'prop-types';
+
+
+                                        function TodoItem( {todo, index, onChange} ) {
+
+
+                                            const styles = {
+                                                li: {
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    padding: '.5rem 1rem',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '4px',
+                                                    marginBottom: '.5rem'
+                                                },
+                                                input: {
+                                                    marginRight: '1rem'
+                                                }
+                                            }
+
+                                            return (
+                                                <div>
+                                                    <li style={styles.li}>
+                                                        <span>
+                                                            <input type='checkbox' style={styles.input} onChange={() => onChange(todo.id)} />
+                                                            <strong>{index + 1}) </strong>
+                                                            {todo.title}  
+                                                        </span>
+
+                                                        <button className='btn'>&times;</button>
+                                                    </li> 
+                                                </div>
+                                            )
+                                        }
+
+
+                                        TodoItem.propTypes = {
+                                            todo: PropTypes.object.isRequired,
+                                            index: PropTypes.number,
+                                            onChange: PropTypes.func.isRequired
+                                        }
+
+
+                                        export default TodoItem
+                                        
+Теперь в ком-те TodoItem передаёт ф-ю onChange. TodoItem выводится в компоненте TodoList поэтому для каждого элемента также нужно передать с-во onChange, но данное событие нужно соединить с родительским элементов , поэтому сюда будет передоваться объект props и метод который я буду предать с рандомным названием(onToggle). Теперь в компоненте TodoList я принимаю метод onToggle.
+
+                                        import React from 'react';
+                                        import TodoItem from './TodoItem';
+                                        import PropTypes from 'prop-types';
+
+                                        function TodoList(props) {
+
+                                            const styles = {
+                                                ul: {
+                                                    listStyle: 'none',
+                                                    margine: 0,
+                                                    padding: 0
+                                                }
+                                            }
+
+                                            return (
+                                                <div>
+                                                    <ul style={styles.ul}>
+                                                        {props.todos.map((todo, index) => {
+                                                            return <TodoItem 
+                                                            todo={todo} 
+                                                            key={todo.id} 
+                                                            index={index} 
+                                                            onChange={props.onToggle}/>
+                                                        })}
+                                                    </ul>
+                                                </div>
+                                            )
+                                        }
+
+
+                                        TodoList.propTypes = {
+                                            todos: PropTypes.arrayOf(PropTypes.object).isRequired,
+                                            onToggle: PropTypes.func.isRequired
+                                        }
+
+                                        export default TodoList
+                                        
+В компоненте App, где вывожу список TodoList передаю параметр onToggle и метод который я буду вызывать скажем будет toggleTodo. Метод toggleTodo нужно определить в компоненте App , это будет обычная ф-я 
+                        <TodoList todos={todos} onToggle={toggleTodo}/>
+                                  function toggleTodo(id) {
+                                        console.log('todo id', id);
+                                    }
+Теперь нужно изменить state для этого нужно обратиться к массиву todos и изменить его, переопределяя его с помощью map, где на каждой итерации мы принимаем объект todo и если todo.id === с тем id по которому мы кликнули, того его поле todo.completed будет равняться противоположному значению todo.completed
+                
+                    function toggleTodo(id) {
+                        todos = todos.map(todo => {
+                            if (todo.id === id) {
+                                todo.completed = !todo.completed
+                            }
+                            return todo
+                        })
+                    }
+                    
+в таком члучае реакт не будет перерендеривать компоннт, хотя мы как-бы изменили состояние , таким образом стате задать нельзя 
+___-для того чтобы определить state за которым будет следить React для того чтобы перерендоривать наш шаблон и добавлять динамики приложению , нужно определять через ф-ю useState - всегда возвращает массив состоящее из двух элементов , начальное состояние(поумолчанию) и второе - ф-я позволяющее изменять данное состояниее для того чтобы React видел эти изменения  
+
+                                        import React from 'react';
+                                        import TodoList from './Todo/TodoList'
+
+
+                                        function App() {
+
+                                            const [todos, setTodos] = React.useState(
+                                                [
+                                                    {id: 1, completed: false, title: "Забег на лыжах 2 км"},
+                                                    {id: 2, completed: false, title: "Ужин в 18:00"},
+                                                    {id: 3, completed: false, title: "Английский с 19:00 до 19:45"}
+                                                ]
+                                            )
+
+
+                                            function toggleTodo(id) {
+                                                setTodos (
+                                                    todos.map(todo => {
+                                                        if (todo.id === id) {
+                                                            todo.completed = !todo.completed
+                                                        }
+                                                        return todo
+                                                    }) 
+                                                ) 
+                                            }
+
+                                          return(
+                                              <div className='wrapper'>
+                                                  <h1>Todo на сегодня:</h1>
+                                                  <TodoList todos={todos} onToggle={toggleTodo}/> 
+                                              </div>
+                                          )
+                                        }
+
+                                        export default App;
+
+
+Теперь нужно отобразить что todo выполнено . Для этого заведу класс активности
+                        
+                        .done{
+                               text-decoration: line-through;
+                             }
+                             
+теперь нужно дабавлять этот класс в зависимости от состояния поля completed, если true добавляем класс  
+                                
+                                    const classes = []
+
+
+                                    if (todo.completed) {
+                                        classes.push('done')
+                                    }
+создали пустой массив и спросили если todo.completed === true , то в массив  будет добавлен done
+
+Массив необходимо передать в шаблон. Например тегу span 
+                <span className={classes.join(' ')}>
+        т.к в атрибут className должны передавать строку воспользуюсь методом join клоторый приводит массив к строке , каждый элемент в данном случаи соединяется через пробел, это на тот случае если в массиве classes будет несколько классов , тогда они будут добавляться в тегу span через пробел
+        И если сейчас чекать задачи то они будут перечёркиваться
