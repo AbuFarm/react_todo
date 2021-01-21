@@ -531,3 +531,97 @@ ___-для того чтобы определить state за которым б
                                                 export default TodoItem
         
 ----------------------Кнопка удаления в todo----------------------
+
+Выше был разобран способ передачи ф-и onChange по этапу от дочернего элемента к родительскому
+
+--------------------------В rect есть фича - помогающая напрямую передовать определённые свойства избегая некоторых промежуточных этапов--------------------------
+
+Для этого в папке src я заведу новый файл с названием context.js. здесь мне нужно создать определённый контекст, который в последствии я буду использовать
+создам переменную , любое название и я получу её из React.createContext(), далее импортирую её по дефолту и подключю его в App
+
+                                        import React from 'react';
+
+                                        const Context = React.createContext()
+
+                                        export default Context
+
+Для того чтобы передавать определённые ф-и сквозь другие компоненты необходимо весь шаблон обернуть в специальный компонент  <Context.Provider></Context.Provider>
+
+                                        <Context.Provider>
+                                          <div className='wrapper'>
+                                            <h1>Todo на сегодня:</h1>
+                                            <TodoList todos={todos} onToggle={toggleTodo}/> 
+                                          </div>
+                                      </Context.Provider>
+                                      
+Дальше я могу указать св-ва для <Context.Provider value={{}}> первые {} указывает типа "" второй же на объект , куда мы можем передовать всё что угодно
+
+--- Нужно реализовать ф-ал для удаления определённого todo
+
+                                        function removeTodo(id) {
+                                                setTodos(todos.filter(todo=> todo.id !== id))
+                                            }
+пробегаюсь по массиву todos с помощью метода filter , где на каждой итерации я буду получать объект todo и дальше буду сравнивать если todo.id не равняется тому id который мы передаём в данную ф-ю , то мы оставляем элемент в массиве, если жже он совпадает , то он удалиться . Теперь есть ф-я removeTodo и её можно передать в качестве значения value {removeTodo:removeTodo} , т.к ключ и значения слвпадают можно оставить value={{removeTodo}}. С помощью context передаём ф-ю removeTodo и дальше в компоненте TodoItem нам необходимо получить. Для этого импортирую тот же самый контекст 
+                                        import Context from '../context'
+
+Учитывая что компонент TodoItem явл ф-ым , здесь мне необходимо обработать этот контекст через useContext
+                                         import React, { useContext } from 'react';
+далее нужно воспользоваться ф-е useContext внутри ф-и TodoItem
+        const {} = useContext(Context) - создам пустой {} и как значение будут вызывать useContext куда передам тот Context который подключали.
+Тут на выходе получаем объект который совпадает с тем значение value который был передан в App value={{removeTodo}}
+
+                                                                import React from 'react';
+                                                                import TodoList from './Todo/TodoList';
+                                                                import Context from './context'
+
+
+
+                                                                function App() {
+
+                                                                    const [todos, setTodos] = React.useState(
+                                                                        [
+                                                                            {id: 1, completed: false, title: "Забег на лыжах 2 км"},
+                                                                            {id: 2, completed: true, title: "Ужин в 18:00"},
+                                                                            {id: 3, completed: false, title: "Английский с 19:00 до 19:45"}
+                                                                        ]
+                                                                    )
+
+
+                                                                    function toggleTodo(id) {
+                                                                        setTodos (
+                                                                            todos.map(todo => {
+                                                                                if (todo.id === id) {
+                                                                                    todo.completed = !todo.completed
+                                                                                }
+                                                                                return todo
+                                                                            }) 
+                                                                        ) 
+                                                                    }
+
+                                                                    function removeTodo(id) {
+                                                                        setTodos(todos.filter(todo=> todo.id !== id))
+                                                                    }
+
+                                                                  return(
+                                                                      <Context.Provider value={{removeTodo}}>
+                                                                          <div className='wrapper'>
+                                                                            <h1>Todo на сегодня:</h1>
+                                                                            <TodoList todos={todos} onToggle={toggleTodo}/> 
+                                                                          </div>
+                                                                      </Context.Provider>
+                                                                  )
+                                                                }
+
+                                                                export default App;
+
+и учитывая что у данного объекта есть ключ removeTodo, то мы также в компоненте можем получить значение TodoItem.js:    const {removeTodo} = useContext(Context)
+Эта ф-я которая принимает в себья некоторую id. Что из этого можно селать на кнопочке button можно вызвать обработчик события onClick и передать значения removeTodo. Данная ф-я должна быть вызвана с тем id который нужно удалить
+                        <button className='btn' onClick={removeTodo(todo.id)}>&times;</button>
+так вызвать нельзя , т.к она будет вызвана сразу как будет инициализирована и мы получим пустой список todo , т.к все сразу удалились 
+Для того чтобы это ф-я сразу не вызывалась существует два способа : 
+                                1)  передать calllback               
+                                                        <button className='btn' onClick={() => removeTodo(todo.id)}>&times;</button>
+                                2) по памяти взможно более производительный . прописываю removeTodo и с помощью метода bind буду возвращать новую ф-ю , т.е ф-я removeTodo не будет вызываться , но эта ф-я будет привязана с нулевым контекстом (первый параметр - неважно что переддаём) , а вторым параметром будет todo.id
+                                                        <button className='btn' onClick={removeTodo.bind(null, todo.id)}>&times;</button>
+Таким образом todoшки удаляются избегая компонента TodoList
+                                
