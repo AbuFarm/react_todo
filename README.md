@@ -451,13 +451,13 @@ ___-для того чтобы определить state за которым б
                                         export default App;
 
 
-Теперь нужно отобразить что todo выполнено . Для этого заведу класс активности
+Теперь нужно отобразить что todo выполнено . Для этого заведу класс активности CSS
                         
                         .done{
                                text-decoration: line-through;
                              }
                              
-теперь нужно дабавлять этот класс в зависимости от состояния поля completed, если true добавляем класс  
+теперь нужно дабавлять этот класс в зависимости от состояния поля completed, если true добавляем класс  TodoItem
                                 
                                     const classes = []
 
@@ -473,4 +473,61 @@ ___-для того чтобы определить state за которым б
         И если сейчас чекнуть задачу то она будут перечёркиваться. но если в изначальном state completed = folse, то задача будет перечёркнута, но не без чека
 исправляю для этого в поле input прописываю checked и передаю условие которое содержится в {todo.completed}. другими словами в checked передатся состояние true/folse
         
-----------------------Кнопка удаления todo--------------
+                                                import React from 'react';
+                                                import PropTypes from 'prop-types';
+
+
+                                                function TodoItem( {todo, index, onChange} ) {
+                                                    const classes = []
+
+
+                                                    if (todo.completed) {
+                                                        classes.push('done')
+                                                    }
+
+                                                    const styles = {
+                                                        li: {
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            padding: '.5rem 1rem',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '4px',
+                                                            marginBottom: '.5rem'
+                                                        },
+                                                        input: {
+                                                            marginRight: '1rem'
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <div>
+                                                            <li style={styles.li}>
+                                                                <span className={classes.join(' ')}>
+                                                                    <input 
+                                                                    type='checkbox' 
+                                                                    checked={todo.completed}
+                                                                    style={styles.input} 
+                                                                    onChange={() => onChange(todo.id)} 
+                                                                    />
+                                                                    <strong>{index + 1}) </strong>
+                                                                    {todo.title}  
+                                                                </span>
+
+                                                                <button className='btn'>&times;</button>
+                                                            </li> 
+                                                        </div>
+                                                    )
+                                                }
+
+
+                                                TodoItem.propTypes = {
+                                                    todo: PropTypes.object.isRequired,
+                                                    index: PropTypes.number,
+                                                    onChange: PropTypes.func.isRequired
+                                                }
+
+
+                                                export default TodoItem
+        
+----------------------Кнопка удаления в todo----------------------
