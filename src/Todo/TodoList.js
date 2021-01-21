@@ -2,7 +2,7 @@ import React from 'react';
 import TodoItem from './TodoItem';
 import PropTypes from 'prop-types';
 
-function TodoList(props, onToggle) {
+function TodoList(props) {
 
     const styles = {
         ul: {
