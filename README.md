@@ -624,4 +624,70 @@ ___-для того чтобы определить state за которым б
                                 2) по памяти взможно более производительный . прописываю removeTodo и с помощью метода bind буду возвращать новую ф-ю , т.е ф-я removeTodo не будет вызываться , но эта ф-я будет привязана с нулевым контекстом (первый параметр - неважно что переддаём) , а вторым параметром будет todo.id
                                                         <button className='btn' onClick={removeTodo.bind(null, todo.id)}>&times;</button>
 Таким образом todoшки удаляются избегая компонента TodoList
+                                ------------При удаление всх todo будет соответствующеее оповещение------------
+
+где выводим компонент TodoList моно добавить определённое условие , чтобы обратиться к JS внутри шаблона нужно указать {} и дальше спрашиваем , если в массиве todos и в его поле length что-то есть отличное от 0 , то тогда будем вывадиь компонент todoList, а иначе будем выводить нет записей
+
+                                <Context.Provider value={{removeTodo}}>
+                                  <div className='wrapper'>
+                                    <h1>Todo на сегодня:</h1>
+                                    {todos.length ? <TodoList todos={todos} onToggle={toggleTodo}/> : <p>No todos</p>} 
+                                  </div>
+                              </Context.Provider>
+                                )
                                 
+------------Дабавим ф-нал добавления новых todo------------
+
+Для этого нужно создать новый компонет AddTodo. js например и
+
+                                        import React from 'react';
+
+
+                                        function AddTodo() {
+                                            return (
+                                                <form>
+                                                    <input/>
+                                                    <button type='submit'>Add todo</button>
+                                                </form>
+                                            )
+                                        }
+
+
+                                        export default AddTodo
+                                        
+Подключаю компонент в Add.js , можно подключить сразу осле заголовка h1
+          <AddTodo onCreate={addTodo} />
+---- Теперь есть возможность добавить новую todo , но при добавлении поле ввода не очищается ----
+Для этого в компоненте AddTodo после метода pnCreate можно вызвать setValue со значением ''
+                        
+                        import React, {useState} from 'react';
+                        import PropTypes from 'prop-types';
+
+
+                        function AddTodo({ onCreate }) {
+                            const [value, setValue] = useState('')
+
+                            function submitHandler(event) {
+                                event.preventDefault()
+
+
+                                if(value.trim()) {
+                                    onCreate(value)
+                                    setValue('')
+                                }
+                            }
+
+                            return (
+                                <form style={{margineBottom: '1rem'}} onSubmit={submitHandler}>
+                                    <input value={value} onChange={event => setValue(event.target.value)}/>
+                                    <button type='submit'>Add todo</button>
+                                </form>
+                            )
+                        }
+
+                        AddTodo.propTypes = {
+                            onCreate: PropTypes.func.isRequired
+                        }
+
+
+                        export default AddTodo
